@@ -87,7 +87,7 @@ tema <- theme(
   panel.grid.major.x = element_blank(),
   panel.grid.minor.x = element_blank(),
   plot.title = element_text(family = "Manrope Extrabold", size = 10, color = "black"),
-  axis.line = element_line(colour = "white"),
+  axis.line = element_blank(),
   plot.title.position = "plot",
   axis.title = element_text(family = "Manrope", size = 12)) 
 
