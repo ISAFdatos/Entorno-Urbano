@@ -185,21 +185,25 @@ renderPlotly({
   size = 14,
   color = "black")
   
+  locmun <- loc_mun() %>% filter(nom_loc==input$y)
   nombres  <- texto %>% filter(nom_cort==input$x)
-  sonmza <- readr::read_csv_chunked("datos/caracteristicaslonger2020.csv", 
-  callback = DataFrameCallback$new(function(x, pos) subset(x, nom_loc == as.character(input$y) & caract==nombres$caract))) 
+  descarga <- paste0("https://raw.githubusercontent.com/ISAFdatos/Entorno-Urbano/main/mapas/",locmun$cveloc,"_",nombres$caract,"_2020.png")
+  
+
+  sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",input$mun,"_caract.csv"), 
+  callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc & caract==nombres$caract))) 
 
   nombres$subtitulo <- paste(strwrap(nombres$subtitulo, width = 45), collapse = "\n")
   loc_aggr <- sonmza %>% 
-    group_by(clasf_prop) %>% summarise(Manzanas=sum(num)) %>% 
+    group_by(valor) %>% summarise(Manzanas=sum(num)) %>% 
     mutate(pctj=round(Manzanas*100/sum(Manzanas),0),
            Proporción=paste0(pctj,"%")) %>% 
-     mutate(valor=case_when(clasf_prop=="Todas las\r\nvialidades"~ 3,
-                            clasf_prop=="Alguna\r\nvialidad"~ 2,
-                            clasf_prop=="Ninguna\r\nvialidad"~ 1)) %>% 
+     mutate(clasf_prop=case_when(valor==3~ "Todas las\nvialidades",
+                            valor== 2 ~ "Alguna\nvialidad",
+                            valor==1 ~ "Ninguna\nvialidad")) %>% 
     mutate(clasf_prop= fct_reorder(clasf_prop, valor, .desc = FALSE))
 
-colors <- c("Todas las\r\nvialidades" = "#FD9D24","Alguna\r\nvialidad"="#72bcd5",  "Ninguna\r\nvialidad"= "#376795")
+colors <- c("Todas las\nvialidades" = "#FD9D24","Alguna\nvialidad"="#72bcd5",  "Ninguna\nvialidad"= "#376795")
   
 caractG <- ggplot(loc_aggr ) +
       geom_col(aes(x= clasf_prop, y= pctj, fill=clasf_prop), linetype= "solid", size=1, width = .4)+
@@ -214,7 +218,12 @@ caractG <- ggplot(loc_aggr ) +
 caractG
 
 ggplotly(caractG, tooltip = "label") %>%
-      layout(showlegend = FALSE, title = list(text = nombres$subtitulo, font=t,  x = 0, xanchor = 'left')) %>%  
+      layout(showlegend = FALSE, title = list(text = nombres$subtitulo, font=t,  x = 0, xanchor = 'left'),
+             annotations = list(x = 1, y = 0, 
+                                text = paste0("<a href = '",descarga,"'>Descarga este mapa</a>"),
+                            xref='paper', yref='paper', showarrow = F, 
+                            xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                            font = list(size = 15))) %>%  
   config(displaylogo = FALSE,
                                                        modeBarButtonsToRemove = list(
                                                          'sendDataToCloud',
@@ -230,6 +239,7 @@ ggplotly(caractG, tooltip = "label") %>%
                                                          'resetScale2d'
                                                        ))
  }) 
+
 ```
 
 
@@ -242,12 +252,13 @@ Column {data-width=700}
 
 renderLeaflet({
 
+  locmun <- loc_mun() %>% filter(nom_loc==input$y)
   nombres  <- texto %>% filter(nom_cort==input$x)
-  sonmza <- readr::read_csv_chunked("datos/caracteristicaslonger2020.csv", 
-  callback = DataFrameCallback$new(function(x, pos) subset(x, nom_loc == as.character(input$y) & caract==nombres$caract))) 
+  sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",input$mun,"_caract.csv"), 
+  callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc & caract==nombres$caract))) 
 
   centrocol <- readr::read_csv_chunked("datos/centrocol.csv", 
-  callback = DataFrameCallback$new(function(x, pos) subset(x, nom_loc == as.character(input$y)))) 
+  callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc))) 
   
   
   capa_mz <- st_read("shapes/26m.gpkg")  %>% 
@@ -267,7 +278,7 @@ renderLeaflet({
   
   popup <- paste0(
      "<b>", "Municipio: ",        "</b>",   (input$mun) ,     "<br>",
-    "<b>", "Localidad: ",        "</b>",   (capa_mz$nom_loc) ,     "<br>",
+    "<b>", "Localidad: ",        "</b>",   (input$y) ,     "<br>",
      "<b>", "Colonia: ",        "</b>",   (capa_mz$nom_col) ,     "<br>",
     "<b>", "Manzana: ",        "</b>",   capa_mz$cve_ageb, capa_mz$cve_mza ,     "<br>",
      "<b>", "Habitantes: ",           "</b>",   prettyNum(capa_mz$pobtot, big.mark=","),     "<br>", 
@@ -275,8 +286,7 @@ renderLeaflet({
   
   label <- paste0(
      "<b>", capa_mz$nom_col, " ", capa_mz$cve_ageb, capa_mz$cve_mza ,    "</b>",   "<br>")  %>% lapply(htmltools::HTML)
-labelcol <- paste0(
-     "<b>",  centrocol$nom_col, "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+
 
   
 leaflet(capa_mz, options = leafletOptions(zoomControl = FALSE)) %>% 
