@@ -1,0 +1,25 @@
+library(shiny)
+library(shinyjs)
+
+init <- 5
+shinyApp(
+  ui = fluidPage(
+    useShinyjs(),
+    br(),
+    actionButton("add", "Add"),
+    verbatimTextOutput("test")
+  ),
+  server = function(input, output, session) {
+    
+    o <- observe({
+      shinyjs::click("add")
+      o$destroy() # destroy observer as it has no use after initial button click
+    })
+    
+    val <- eventReactive(input$add, {
+      init + 1
+    })
+    
+    output$test <- renderPrint(val())
+  }
+)

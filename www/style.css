@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;900&display=swap');
+
+.box.box-solid.box-warning {
+    border: 0px solid #f39c12;
+}
+
+
+.sidebar .fa-classic, .fa-regular, .fa-solid, .far, .fas { 
+  font-size: 20px; 
+  color:#f39c12;
+}
+
+.small-box p {
+    font-family: Manrope !important;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.btn, .input-group-btn .btn {
+    border-radius: 2px;
+    position: relative;
+    padding: 8px 10px;
+    margin: 10px 10px !important;
+    font-size: 24px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5;
+    font-family: Manrope !important;
+}
+
+.small-box h3 {
+    font-family: Manrope !important;
+    font-size: 38px;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+    white-space: nowrap;
+    padding: 0;
+}
+
+
+.selectize-control.multi .selectize-input, .selectize-control.multi .selectize-input.input-active, .selectize-control.single .selectize-input, .selectize-control.single .selectize-input.input-active {
+    cursor: text;
+    background: 0 0;
+    -webkit-box-shadow: none;
+    font-family: Manrope !important;
+    box-shadow: none;
+    border: 0;
+    padding: 0;
+    height: 100%;
+    font-size: 18px;
+    line-height: 30px;
+}
+
+
+
+.value-box {
+  height: 125px;
+}
+
+.selectize-input > * {
+    vertical-align: baseline;
+    display: -moz-inline-stack;
+    display: inline-block;
+    zoom: 1;
+    *display: inline;
+    color:#FD9D24;
+}
+.form-group label.control-label {
+    font-family: Manrope !important;
+    font-size: 12px;
+    line-height: 1.07143;
+    font-weight: 700;
+    margin: 5px 0px 0px;
+    color:black;
+}
+
+.small-box .icon-large {
+    position: absolute;
+    top: auto;
+    bottom: 5px;
+    right: 10px;
+    font-size: 40px;
+    color: rgba(0, 0, 0, 0.15);
+}
+
+
+section.sidebar .shiny-bound-input.action-button, section.sidebar .shiny-bound-input.action-link {
+    margin: 6px 5px 6px 70px;
+    display: block;
+}
+
+section.sidebar .shiny-bound-input.action-button, section.sidebar .shiny-bound-input.action-link {
+    font-family: Manrope !important;
+    font-size: 16px;
+    font-weight: 900;
+    color:#FD9D24;
+}
+
+.form-group {
+    padding-bottom: 7px;
+    margin: 10px 0 0 0;
+}
+
+.navbar-dark .navbar-brand, .navbar.navbar-inverse .navbar-brand {
+  color: white;
+}
+
+.navbar-dark .navbar-nav .show>.nav-link, .navbar-dark .navbar-nav .in>.nav-link, .navbar-dark .navbar-nav .nav-tabs>li.show>a, .navbar-dark .navbar-nav .nav-tabs>li.in>a, .navbar-dark .navbar-nav .nav-pills>li.show>a, .navbar-dark .navbar-nav .nav-pills>li.in>a, .navbar.navbar-inverse .navbar-nav .show>.nav-link, .navbar.navbar-inverse .navbar-nav .in>.nav-link, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.show>a, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.in>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.show>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.in>a, .navbar-dark ul.nav.navbar-nav>li.show>a, .navbar-dark ul.nav.navbar-nav>li.in>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.show>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.in>a, .navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-tabs>li.active>a, .navbar-dark .navbar-nav .nav-pills>li.active>a, .navbar.navbar-inverse .navbar-nav .active>.nav-link, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.active>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.active>a, .navbar-dark ul.nav.navbar-nav>li.active>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.active>a, .navbar-dark .navbar-nav .nav-link.show, .navbar-dark .navbar-nav .nav-link.in, .navbar-dark .navbar-nav .nav-tabs>li>a.show, .navbar-dark .navbar-nav .nav-tabs>li>a.in, .navbar-dark .navbar-nav .nav-pills>li>a.show, .navbar-dark .navbar-nav .nav-pills>li>a.in, .navbar.navbar-inverse .navbar-nav .nav-link.show, .navbar.navbar-inverse .navbar-nav .nav-link.in, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.show, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.in, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.show, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.in, .navbar-dark ul.nav.navbar-nav>li>a.show, .navbar-dark ul.nav.navbar-nav>li>a.in, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.show, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.in, .navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .nav-tabs>li>a.active, .navbar-dark .navbar-nav .nav-pills>li>a.active, .navbar.navbar-inverse .navbar-nav .nav-link.active, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.active, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.active, .navbar-dark ul.nav.navbar-nav>li>a.active, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.active {
+    color: white;
+}
+
+
+.shiny-output-error { visibility: hidden; }",
+.shiny-output-error:before { visibility: hidden; }
+
+
+
+.navbar {
+  background-color:#FFFFFF;
+  border-color:#FD9D24;
+  hover-color:#FD9D24;
+}
+navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  color: #FD9D24;
+  background-color: #FD9D24;
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: #FD9D24;
+  background-color: #FD9D24;
+}
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+  background-color: #FD9D24;
+}
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+  border-color: #FD9D24;
+{
+
+
+.value-box .value {
+    color: white;
+}
+.value-box .caption {
+    color: white;
+}
+
+

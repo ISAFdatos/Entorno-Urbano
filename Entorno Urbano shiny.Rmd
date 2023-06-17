@@ -31,13 +31,13 @@ resource_files:
 navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-nav > li > a:focus {
   color: #FD9D24;
-  background-color: #FFFFFF;
+  background-color: #FD9D24;
 }
 .navbar-inverse .navbar-nav > .active > a,
 .navbar-inverse .navbar-nav > .active > a:hover,
 .navbar-inverse .navbar-nav > .active > a:focus {
   color: #FD9D24;
-  background-color: white;
+  background-color: #FD9D24;
 }
 .navbar-inverse .navbar-toggle:hover,
 .navbar-inverse .navbar-toggle:focus {
@@ -47,9 +47,7 @@ navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-form {
   border-color: #FD9D24;
 {
-.navbar-brand {
-font-family: Poppins Extrabold
-}
+
 
 </style>  
 
@@ -66,11 +64,45 @@ font-family: Poppins Extrabold
 .value-box {
   height: 100px;
 }
+
+.navbar-brand {
+font-family: Poppins Extrabold;
+}
+.navbar-dark .navbar-brand, .navbar.navbar-inverse .navbar-brand {
+  color: white;
+}
+
+.navbar-dark .navbar-nav .show>.nav-link, .navbar-dark .navbar-nav .in>.nav-link, .navbar-dark .navbar-nav .nav-tabs>li.show>a, .navbar-dark .navbar-nav .nav-tabs>li.in>a, .navbar-dark .navbar-nav .nav-pills>li.show>a, .navbar-dark .navbar-nav .nav-pills>li.in>a, .navbar.navbar-inverse .navbar-nav .show>.nav-link, .navbar.navbar-inverse .navbar-nav .in>.nav-link, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.show>a, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.in>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.show>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.in>a, .navbar-dark ul.nav.navbar-nav>li.show>a, .navbar-dark ul.nav.navbar-nav>li.in>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.show>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.in>a, .navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-tabs>li.active>a, .navbar-dark .navbar-nav .nav-pills>li.active>a, .navbar.navbar-inverse .navbar-nav .active>.nav-link, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.active>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.active>a, .navbar-dark ul.nav.navbar-nav>li.active>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.active>a, .navbar-dark .navbar-nav .nav-link.show, .navbar-dark .navbar-nav .nav-link.in, .navbar-dark .navbar-nav .nav-tabs>li>a.show, .navbar-dark .navbar-nav .nav-tabs>li>a.in, .navbar-dark .navbar-nav .nav-pills>li>a.show, .navbar-dark .navbar-nav .nav-pills>li>a.in, .navbar.navbar-inverse .navbar-nav .nav-link.show, .navbar.navbar-inverse .navbar-nav .nav-link.in, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.show, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.in, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.show, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.in, .navbar-dark ul.nav.navbar-nav>li>a.show, .navbar-dark ul.nav.navbar-nav>li>a.in, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.show, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.in, .navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .nav-tabs>li>a.active, .navbar-dark .navbar-nav .nav-pills>li>a.active, .navbar.navbar-inverse .navbar-nav .nav-link.active, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.active, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.active, .navbar-dark ul.nav.navbar-nav>li>a.active, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.active {
+    color: white;
+}
+
+
+.shiny-output-error { visibility: hidden; }",
+.shiny-output-error:before { visibility: hidden; }
 ```
 
 ```{r setup, include=FALSE}
 if(!require('pacman')) install.packages('pacman')
-pacman::p_load(tidyverse,'Cairo',janitor,ggtext,sf, ggmap, png, ggspatial,rgdal, shiny, htmltools,htmlwidgets, flexdashboard, leaflet, leaflet.extras, leafem, plotly)
+
+
+library(tidyverse)
+library('Cairo')
+library(janitor)
+library(sf)
+library(ggspatial)
+library(rgdal)
+library(shiny)
+library(shinycssloaders)
+library(htmltools)
+library(htmlwidgets)
+library(flexdashboard)
+library(leaflet)
+library(leaflet.extras)
+library(leafem)
+library(plotly)
+library(lubridate)
+library(scales)
+
 ```
 
 ```{r, include=FALSE}
@@ -138,6 +170,8 @@ renderUI({selectInput("y", label = "Localidad:", choices = loc_mun()$nom_loc, se
 selectInput("x", label = "Característica urbana:", choices = unique(texto$nom_cort), selected="Pavimentación")
 
 
+
+
 ```
 
 <center>
@@ -179,7 +213,7 @@ Column {data-width=240}
 
 ### 
 ```{r, }
-renderPlotly({
+output$plot <- renderPlotly({
   
   t <- list(
   size = 14,
@@ -190,23 +224,23 @@ renderPlotly({
   descarga <- paste0("https://raw.githubusercontent.com/ISAFdatos/Entorno-Urbano/main/mapas/",locmun$cveloc,"_",nombres$caract,"_2020.png")
   
 
-  sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",input$mun,"_caract.csv"), 
+  sonmza <- readr::read_csv_chunked("datos/caracteristicaslonger2020.csv", 
   callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc & caract==nombres$caract))) 
 
   nombres$subtitulo <- paste(strwrap(nombres$subtitulo, width = 45), collapse = "\n")
   loc_aggr <- sonmza %>% 
-    group_by(valor) %>% summarise(Manzanas=sum(num)) %>% 
+    group_by(clasf_prop) %>% summarise(Manzanas=sum(num), Poblacion=sum(pobtot)) %>% 
     mutate(pctj=round(Manzanas*100/sum(Manzanas),0),
            Proporción=paste0(pctj,"%")) %>% 
-     mutate(clasf_prop=case_when(valor==3~ "Todas las\nvialidades",
-                            valor== 2 ~ "Alguna\nvialidad",
-                            valor==1 ~ "Ninguna\nvialidad")) %>% 
+     mutate(valor=case_when(clasf_prop=="Todas las\r\nvialidades"~ 3,
+                            clasf_prop=="Alguna\r\nvialidad"~ 2,
+                            clasf_prop=="Ninguna\r\nvialidad"~ 1)) %>% 
     mutate(clasf_prop= fct_reorder(clasf_prop, valor, .desc = FALSE))
 
-colors <- c("Todas las\nvialidades" = "#FD9D24","Alguna\nvialidad"="#72bcd5",  "Ninguna\nvialidad"= "#376795")
+colors <- c("Todas las\r\nvialidades" = "#FD9D24","Alguna\r\nvialidad"="#72bcd5",  "Ninguna\r\nvialidad"= "#376795")
   
 caractG <- ggplot(loc_aggr ) +
-      geom_col(aes(x= clasf_prop, y= pctj, fill=clasf_prop), linetype= "solid", size=1, width = .4)+
+      geom_col(aes(x= clasf_prop, y= pctj, fill=clasf_prop, text=paste0(loc_aggr$Manzanas, " manzanas<br>",loc_aggr$Poblacion," habs." )), linetype= "solid", size=1, width = .4)+
       geom_text(aes(x= clasf_prop, y= pctj+15, label=Proporción, color=clasf_prop), family="Manrope", ) +
       scale_fill_manual(name="", values= colors) +
       scale_color_manual(name="", values= colors) +
@@ -215,9 +249,9 @@ caractG <- ggplot(loc_aggr ) +
       tema +
       labs(y = NULL, x = NULL, fill = NULL, title = NULL ) +
       coord_flip() 
-caractG
 
-ggplotly(caractG, tooltip = "label") %>%
+
+ggplotly(caractG, tooltip = "text") %>%
       layout(showlegend = FALSE, title = list(text = nombres$subtitulo, font=t,  x = 0, xanchor = 'left'),
              annotations = list(x = 1, y = 0, 
                                 text = paste0("<a href = '",descarga,"'>Descarga este mapa</a>"),
@@ -240,6 +274,8 @@ ggplotly(caractG, tooltip = "label") %>%
                                                        ))
  }) 
 
+withSpinner(plotlyOutput("plot"), type=7, color="#FD9D24", proxy.height ="400px")
+
 ```
 
 
@@ -254,7 +290,7 @@ renderLeaflet({
 
   locmun <- loc_mun() %>% filter(nom_loc==input$y)
   nombres  <- texto %>% filter(nom_cort==input$x)
-  sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",input$mun,"_caract.csv"), 
+  sonmza <- readr::read_csv_chunked("datos/caracteristicaslonger2020.csv", 
   callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc & caract==nombres$caract))) 
 
   centrocol <- readr::read_csv_chunked("datos/centrocol.csv", 
@@ -286,11 +322,12 @@ renderLeaflet({
   
   label <- paste0(
      "<b>", capa_mz$nom_col, " ", capa_mz$cve_ageb, capa_mz$cve_mza ,    "</b>",   "<br>")  %>% lapply(htmltools::HTML)
-
+labelcol <- paste0(
+     "<b>",  centrocol$nom_col, "</b>",   "<br>")  %>% lapply(htmltools::HTML)
 
   
 leaflet(capa_mz, options = leafletOptions(zoomControl = FALSE)) %>% 
-    addProviderTiles(providers$CartoDB.Positron) %>%
+    addProviderTiles(providers$CartoDB.Voyager) %>%
     addCircles(data=centrocol, ~lon, ~lat, label = ~nom_col, color="transparent",
                    labelOptions = labelOptions(noHide = F, direction = "top",
                                             style = list(

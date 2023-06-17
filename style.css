@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&display=swap');
+
+
+.skin-blue .main-header .navbar {
+    background-color: #FD9D24;
+}
+
+
+.small-box p {
+    font-family: Manrope !important;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.small-box h3 {
+    font-family: Manrope !important;
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    white-space: nowrap;
+    padding: 0;
+}
+
+
+.value-box {
+  height: 100px;
+}
+
+.navbar-brand {
+font-family: Manrope !important
+    font-size: 38px;
+    font-weight: 700;
+}
+.navbar-dark .navbar-brand, .navbar.navbar-inverse .navbar-brand {
+  color: white;
+}
+
+.navbar-dark .navbar-nav .show>.nav-link, .navbar-dark .navbar-nav .in>.nav-link, .navbar-dark .navbar-nav .nav-tabs>li.show>a, .navbar-dark .navbar-nav .nav-tabs>li.in>a, .navbar-dark .navbar-nav .nav-pills>li.show>a, .navbar-dark .navbar-nav .nav-pills>li.in>a, .navbar.navbar-inverse .navbar-nav .show>.nav-link, .navbar.navbar-inverse .navbar-nav .in>.nav-link, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.show>a, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.in>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.show>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.in>a, .navbar-dark ul.nav.navbar-nav>li.show>a, .navbar-dark ul.nav.navbar-nav>li.in>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.show>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.in>a, .navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-tabs>li.active>a, .navbar-dark .navbar-nav .nav-pills>li.active>a, .navbar.navbar-inverse .navbar-nav .active>.nav-link, .navbar.navbar-inverse .navbar-nav .nav-tabs>li.active>a, .navbar.navbar-inverse .navbar-nav .nav-pills>li.active>a, .navbar-dark ul.nav.navbar-nav>li.active>a, .navbar.navbar-inverse ul.nav.navbar-nav>li.active>a, .navbar-dark .navbar-nav .nav-link.show, .navbar-dark .navbar-nav .nav-link.in, .navbar-dark .navbar-nav .nav-tabs>li>a.show, .navbar-dark .navbar-nav .nav-tabs>li>a.in, .navbar-dark .navbar-nav .nav-pills>li>a.show, .navbar-dark .navbar-nav .nav-pills>li>a.in, .navbar.navbar-inverse .navbar-nav .nav-link.show, .navbar.navbar-inverse .navbar-nav .nav-link.in, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.show, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.in, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.show, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.in, .navbar-dark ul.nav.navbar-nav>li>a.show, .navbar-dark ul.nav.navbar-nav>li>a.in, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.show, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.in, .navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .nav-tabs>li>a.active, .navbar-dark .navbar-nav .nav-pills>li>a.active, .navbar.navbar-inverse .navbar-nav .nav-link.active, .navbar.navbar-inverse .navbar-nav .nav-tabs>li>a.active, .navbar.navbar-inverse .navbar-nav .nav-pills>li>a.active, .navbar-dark ul.nav.navbar-nav>li>a.active, .navbar.navbar-inverse ul.nav.navbar-nav>li>a.active {
+    color: white;
+}
+
+
+.shiny-output-error { visibility: hidden; }",
+.shiny-output-error:before { visibility: hidden; }
+
+
+
+.navbar {
+  background-color:#FFFFFF;
+  border-color:#FD9D24;
+  hover-color:#FD9D24;
+}
+navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  color: #FD9D24;
+  background-color: #FD9D24;
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: #FD9D24;
+  background-color: #FD9D24;
+}
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+  background-color: #FD9D24;
+}
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+  border-color: #FD9D24;
+{
+
+
+.value-box .value {
+    color: white;
+}
+.value-box .caption {
+    color: white;
+}

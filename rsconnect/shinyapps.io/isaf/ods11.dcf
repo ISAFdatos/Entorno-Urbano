@@ -1,0 +1,14 @@
+name: ods11
+title: ods11
+username:
+account: isaf
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9304873
+bundleId: 7355279
+url: https://isaf.shinyapps.io/ods11/
+when: 1686951818.7671
+lastSyncTime: 1686951818.76711
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .gitattributes|Entorno Urbano shiny.Rmd|README.md|style.css

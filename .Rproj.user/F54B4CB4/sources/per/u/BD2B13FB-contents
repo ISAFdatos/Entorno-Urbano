@@ -1,0 +1,27 @@
+caract <- read_csv("datos/caracteristicaslonger2020.csv")
+
+saveRDS(caract, "datos/caract.rds")
+
+
+sonmza <- read_rds("datos/caract.rds")
+
+
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "UTF-8")) 
+
+municipios <- unique(sonmza$nom_mun)
+
+
+caracteristicas_municipio <- function(mun){
+  municipio <- sonmza %>% filter(nom_mun==mun)
+  saveRDS(municipio, paste0("datos/municipios_rds/",mun,"_caract.rds"))
+
+}
+ mun="Hermosillo"
+caracteristicas_municipio(mun)
+
+for(i in municipios){
+  caracteristicas_municipio(i)
+}
+
+
+

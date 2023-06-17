@@ -1,0 +1,512 @@
+addCircles(data=centrocol, ~lon, ~lat, label = ~nom_col, color="transparent",
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "COLONIAS") %>%
+addPolygons(data= capa_mz,
+stroke= TRUE,
+weight=1.2,
+opacity=1,
+fillColor = ~balpal(capa_mz$valor),
+color= "transparent",
+fillOpacity = 0.8,
+smoothFactor = 0.5,
+highlightOptions = highlightOptions(color = "#734001",
+weight = 1.2,
+bringToFront = TRUE),
+popup=popup,
+popupOptions = labelOptions(noHide = F, direction = "top",
+closeOnClick = TRUE,
+style = list(
+"color" = "black",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+label=label,
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "ENTORNO URBANO") %>%
+addSearchFeatures(targetGroups= "COLONIAS", options = searchFeaturesOptions(zoom=15, openPopup=FALSE,moveToLocation=TRUE,
+firstTipSubmit = TRUE,
+autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
+# setView(lng=coord$lon, lat=coord$lat, zoom=coord$zoom+1) %>%
+onRender(
+"function(el, x) {
+L.control.zoom({
+position:'bottomright'
+}).addTo(this);
+}")
+popup <- paste0("<span style = 'font-family:Manrope; font-size: 13px; border-color:rgba(0,0,0,0); color:#734001'>",
+"<b>", "Municipio: ",        "</b>",   (z) ,     "<br>",
+"<b>", "Localidad: ",        "</b>",   (y) ,     "<br>",
+"<b>", "Colonia: ",        "</b>",        "<br>",
+"<b>", "Manzana: ",        "</b>",   capa_mz$cve_ageb, capa_mz$cve_mza ,     "<br>",
+"<b>", "Habitantes: ",           "</b>",   prettyNum(capa_mz$pobtot, big.mark=","),     "<br>",
+"<b>", x, ": ",          "</b>",   as.character(capa_mz$clasf_prop),    "<br>")  %>% lapply(htmltools::HTML)
+label <- paste0(
+"<b>",  " ", capa_mz$cve_ageb, capa_mz$cve_mza ,    "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+labelcol <- paste0(
+"<b>",  centrocol$nom_col, "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+leaflet(capa_mz, options = leafletOptions(zoomControl = FALSE)) %>%
+addProviderTiles(providers$CartoDB.Positron) %>%
+addCircles(data=centrocol, ~lon, ~lat, label = ~nom_col, color="transparent",
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "COLONIAS") %>%
+addPolygons(data= capa_mz,
+stroke= TRUE,
+weight=1.2,
+opacity=1,
+fillColor = ~balpal(capa_mz$valor),
+color= "transparent",
+fillOpacity = 0.8,
+smoothFactor = 0.5,
+highlightOptions = highlightOptions(color = "#734001",
+weight = 1.2,
+bringToFront = TRUE),
+popup=popup,
+popupOptions = labelOptions(noHide = F, direction = "top",
+closeOnClick = TRUE,
+style = list(
+"color" = "black",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+label=label,
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "ENTORNO URBANO") %>%
+addSearchFeatures(targetGroups= "COLONIAS", options = searchFeaturesOptions(zoom=15, openPopup=FALSE,moveToLocation=TRUE,
+firstTipSubmit = TRUE,
+autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
+# setView(lng=coord$lon, lat=coord$lat, zoom=coord$zoom+1) %>%
+onRender(
+"function(el, x) {
+L.control.zoom({
+position:'bottomright'
+}).addTo(this);
+}")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv")
+View(sonmza)
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv")
+View(sonmza)
+x="Pavimentación"
+y="Hermosillo"
+z="Hermosillo"
+nombres  <- texto %>% filter(nom_cort==x)
+locmun <- localidades %>% filter(nom_mun==z & nom_loc==y)
+sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"),
+callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc & caract==nombres$caract)))
+centrocol <- readr::read_csv_chunked("datos/centrocol.csv",
+callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc)))
+capa_mz <- st_read("shapes/26m.gpkg")  %>%
+clean_names() %>%  merge(sonmza)   # Se incorpora la información censal al shape de colonias
+capa_mz <- st_transform(capa_mz, crs = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")) %>%
+st_make_valid()
+balpal <-  colorFactor(c( "#FD9D24","#72bcd5",  "#376795"), levels= c("1","2","3"), na.color ="gray85")
+labs <- c("Todas las\nvialidades","Alguna\nvialidad","Ninguna\nvialidad")
+View(sonmza)
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv") %>%
+filter(nom_mun=="Hermosillo")
+warnings()
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale="latin1") %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale="latin 1") %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale="latin-1") %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale="Windows-1252") %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "WINDOWS-1252")) %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "WINDOWS-1252")) %>%
+filter(nom_mun=="Hermosillo")
+View(sonmza)
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "LATIN-1")) %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "ISO-8859-1")) %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "ISO-8859-1")) %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "UTF-1")) %>%
+filter(nom_mun=="Hermosillo")
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "UTF-8")) %>%
+filter(nom_mun=="Hermosillo")
+runApp()
+nombres  <- texto %>% filter(nom_cort==x)
+locmun <- localidades %>% filter(nom_mun==z & nom_loc==y)
+sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"), locale =locale(encoding = "UTF-8"),
+callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc & caract==nombres$caract)))
+centrocol <- readr::read_csv_chunked("datos/centrocol.csv",
+callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc)))
+capa_mz <- st_read("shapes/26m.gpkg")  %>%
+clean_names() %>%  merge(sonmza)   # Se incorpora la información censal al shape de colonias
+capa_mz <- st_transform(capa_mz, crs = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")) %>%
+st_make_valid()
+balpal <-  colorFactor(c( "#FD9D24","#72bcd5",  "#376795"), levels= c("1","2","3"), na.color ="gray85")
+labs <- c("Todas las\nvialidades","Alguna\nvialidad","Ninguna\nvialidad")
+popup <- paste0("<span style = 'font-family:Manrope; font-size: 13px; border-color:rgba(0,0,0,0); color:#734001'>",
+"<b>", "Municipio: ",        "</b>",   (z) ,     "<br>",
+"<b>", "Localidad: ",        "</b>",   (y) ,     "<br>",
+"<b>", "Colonia: ",        "</b>",   (capa_mz$nom_col) ,     "<br>",
+"<b>", "Manzana: ",        "</b>",   capa_mz$cve_ageb, capa_mz$cve_mza ,     "<br>",
+"<b>", "Habitantes: ",           "</b>",   prettyNum(capa_mz$pobtot, big.mark=","),     "<br>",
+"<b>", x, ": ",          "</b>",   as.character(capa_mz$clasf_prop),    "<br>")  %>% lapply(htmltools::HTML)
+label <- paste0(
+"<b>", capa_mz$nom_col, " ", capa_mz$cve_ageb, capa_mz$cve_mza ,    "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+labelcol <- paste0(
+"<b>",  centrocol$nom_col, "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+leaflet(capa_mz, options = leafletOptions(zoomControl = FALSE)) %>%
+addProviderTiles(providers$CartoDB.Positron) %>%
+addCircles(data=centrocol, ~lon, ~lat, label = ~nom_col, color="transparent",
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "COLONIAS") %>%
+addPolygons(data= capa_mz,
+stroke= TRUE,
+weight=1.2,
+opacity=1,
+fillColor = ~balpal(capa_mz$valor),
+color= "transparent",
+fillOpacity = 0.8,
+smoothFactor = 0.5,
+highlightOptions = highlightOptions(color = "#734001",
+weight = 1.2,
+bringToFront = TRUE),
+popup=popup,
+popupOptions = labelOptions(noHide = F, direction = "top",
+closeOnClick = TRUE,
+style = list(
+"color" = "black",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+label=label,
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "ENTORNO URBANO") %>%
+addSearchFeatures(targetGroups= "COLONIAS", options = searchFeaturesOptions(zoom=15, openPopup=FALSE,moveToLocation=TRUE,
+firstTipSubmit = TRUE,
+autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
+# setView(lng=coord$lon, lat=coord$lat, zoom=coord$zoom+1) %>%
+onRender(
+"function(el, x) {
+L.control.zoom({
+position:'bottomright'
+}).addTo(this);
+}")
+nombres  <- texto %>% filter(nom_cort==x)
+locmun <- localidades %>% filter(nom_mun==z & nom_loc==y)
+sonmza <- readr::read_csv_chunked(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"), locale =locale(encoding = "UTF-8")) %>%
+filter(cveloc == locmun$cveloc & caract==nombres$caract)
+sonmza <- readr::read_csv(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"), locale =locale(encoding = "UTF-8")) %>%
+filter(cveloc == locmun$cveloc & caract==nombres$caract)
+centrocol <- readr::read_csv_chunked("datos/centrocol.csv",
+callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc)))
+capa_mz <- st_read("shapes/26m.gpkg")  %>%
+clean_names() %>%  merge(sonmza)   # Se incorpora la información censal al shape de colonias
+capa_mz <- st_transform(capa_mz, crs = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")) %>%
+st_make_valid()
+balpal <-  colorFactor(c( "#FD9D24","#72bcd5",  "#376795"), levels= c("1","2","3"), na.color ="gray85")
+labs <- c("Todas las\nvialidades","Alguna\nvialidad","Ninguna\nvialidad")
+popup <- paste0("<span style = 'font-family:Manrope; font-size: 13px; border-color:rgba(0,0,0,0); color:#734001'>",
+"<b>", "Municipio: ",        "</b>",   (z) ,     "<br>",
+"<b>", "Localidad: ",        "</b>",   (y) ,     "<br>",
+"<b>", "Colonia: ",        "</b>",   (capa_mz$nom_col) ,     "<br>",
+"<b>", "Manzana: ",        "</b>",   capa_mz$cve_ageb, capa_mz$cve_mza ,     "<br>",
+"<b>", "Habitantes: ",           "</b>",   prettyNum(capa_mz$pobtot, big.mark=","),     "<br>",
+"<b>", x, ": ",          "</b>",   as.character(capa_mz$clasf_prop),    "<br>")  %>% lapply(htmltools::HTML)
+label <- paste0(
+"<b>", capa_mz$nom_col, " ", capa_mz$cve_ageb, capa_mz$cve_mza ,    "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+labelcol <- paste0(
+"<b>",  centrocol$nom_col, "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+leaflet(capa_mz, options = leafletOptions(zoomControl = FALSE)) %>%
+addProviderTiles(providers$CartoDB.Positron) %>%
+addCircles(data=centrocol, ~lon, ~lat, label = ~nom_col, color="transparent",
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "COLONIAS") %>%
+addPolygons(data= capa_mz,
+stroke= TRUE,
+weight=1.2,
+opacity=1,
+fillColor = ~balpal(capa_mz$valor),
+color= "transparent",
+fillOpacity = 0.8,
+smoothFactor = 0.5,
+highlightOptions = highlightOptions(color = "#734001",
+weight = 1.2,
+bringToFront = TRUE),
+popup=popup,
+popupOptions = labelOptions(noHide = F, direction = "top",
+closeOnClick = TRUE,
+style = list(
+"color" = "black",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+label=label,
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "ENTORNO URBANO") %>%
+addSearchFeatures(targetGroups= "COLONIAS", options = searchFeaturesOptions(zoom=15, openPopup=FALSE,moveToLocation=TRUE,
+firstTipSubmit = TRUE,
+autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
+# setView(lng=coord$lon, lat=coord$lat, zoom=coord$zoom+1) %>%
+onRender(
+"function(el, x) {
+L.control.zoom({
+position:'bottomright'
+}).addTo(this);
+}")
+sonmza <- readr::read_csv(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"), locale =locale(encoding = "UTF-8")) %>%
+filter(cveloc == locmun$cveloc & caract==nombres$caract)
+sonmza <- readr::read_csv(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"), locale =locale(encoding = "WINDOWS-1252")) %>%
+filter(cveloc == locmun$cveloc & caract==nombres$caract)
+nombres  <- texto %>% filter(nom_cort==x)
+locmun <- localidades %>% filter(nom_mun==z & nom_loc==y)
+sonmza <- readr::read_csv(paste0("datos/datos urbanos/",locmun$nom_mun,"_caract.csv"), locale =locale(encoding = "WINDOWS-1252")) %>%
+filter(cveloc == locmun$cveloc & caract==nombres$caract)
+centrocol <- readr::read_csv_chunked("datos/centrocol.csv",
+callback = DataFrameCallback$new(function(x, pos) subset(x, cveloc == locmun$cveloc)))
+capa_mz <- st_read("shapes/26m.gpkg")  %>%
+clean_names() %>%  merge(sonmza)   # Se incorpora la información censal al shape de colonias
+capa_mz <- st_transform(capa_mz, crs = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")) %>%
+st_make_valid()
+balpal <-  colorFactor(c( "#FD9D24","#72bcd5",  "#376795"), levels= c("1","2","3"), na.color ="gray85")
+labs <- c("Todas las\nvialidades","Alguna\nvialidad","Ninguna\nvialidad")
+popup <- paste0("<span style = 'font-family:Manrope; font-size: 13px; border-color:rgba(0,0,0,0); color:#734001'>",
+"<b>", "Municipio: ",        "</b>",   (z) ,     "<br>",
+"<b>", "Localidad: ",        "</b>",   (y) ,     "<br>",
+"<b>", "Colonia: ",        "</b>",   (capa_mz$nom_col) ,     "<br>",
+"<b>", "Manzana: ",        "</b>",   capa_mz$cve_ageb, capa_mz$cve_mza ,     "<br>",
+"<b>", "Habitantes: ",           "</b>",   prettyNum(capa_mz$pobtot, big.mark=","),     "<br>",
+"<b>", x, ": ",          "</b>",   as.character(capa_mz$clasf_prop),    "<br>")  %>% lapply(htmltools::HTML)
+label <- paste0(
+"<b>", capa_mz$nom_col, " ", capa_mz$cve_ageb, capa_mz$cve_mza ,    "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+labelcol <- paste0(
+"<b>",  centrocol$nom_col, "</b>",   "<br>")  %>% lapply(htmltools::HTML)
+leaflet(capa_mz, options = leafletOptions(zoomControl = FALSE)) %>%
+addProviderTiles(providers$CartoDB.Positron) %>%
+addCircles(data=centrocol, ~lon, ~lat, label = ~nom_col, color="transparent",
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "COLONIAS") %>%
+addPolygons(data= capa_mz,
+stroke= TRUE,
+weight=1.2,
+opacity=1,
+fillColor = ~balpal(capa_mz$valor),
+color= "transparent",
+fillOpacity = 0.8,
+smoothFactor = 0.5,
+highlightOptions = highlightOptions(color = "#734001",
+weight = 1.2,
+bringToFront = TRUE),
+popup=popup,
+popupOptions = labelOptions(noHide = F, direction = "top",
+closeOnClick = TRUE,
+style = list(
+"color" = "black",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+label=label,
+labelOptions = labelOptions(noHide = F, direction = "top",
+style = list(
+"color" = "#734001",
+"font-family" = "Manrope",
+"font-style" = "regular",
+"box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+"font-size" = "13px",
+"border-color" = "rgba(0,0,0,0.5)"
+)),
+group= "ENTORNO URBANO") %>%
+addSearchFeatures(targetGroups= "COLONIAS", options = searchFeaturesOptions(zoom=15, openPopup=FALSE,moveToLocation=TRUE,
+firstTipSubmit = TRUE,
+autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
+# setView(lng=coord$lon, lat=coord$lat, zoom=coord$zoom+1) %>%
+onRender(
+"function(el, x) {
+L.control.zoom({
+position:'bottomright'
+}).addTo(this);
+}")
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+municipios <- unique(sonmza$nom_mun)
+sonmza <- readr::read_csv("datos/caracteristicaslonger2020.csv", locale =locale(encoding = "UTF-8"))
+municipios <- unique(sonmza$nom_mun)
+caracteristicas_municipio <- function(mun){
+municipio <- sonmza %>% filter(nom_mun==mun)
+saveRDS(municipio, paste0("data/municipios_rds",mun,"_caract.rds"))
+}
+caracteristicas_municipio(mun)
+mun="Hermosillo"
+caracteristicas_municipio(mun)
+caracteristicas_municipio <- function(mun){
+municipio <- sonmza %>% filter(nom_mun==mun)
+saveRDS(municipio, paste0("data/municipios_rds/",mun,"_caract.rds"))
+}
+mun="Hermosillo"
+caracteristicas_municipio(mun)
+saveRDS(municipio, paste0("datos/municipios_rds/",mun,"_caract.rds"))
+caracteristicas_municipio <- function(mun){
+municipio <- sonmza %>% filter(nom_mun==mun)
+saveRDS(municipio, paste0("datos/municipios_rds/",mun,"_caract.rds"))
+}
+mun="Hermosillo"
+caracteristicas_municipio(mun)
+for(i in municipios){
+caracteristicas_municipio(i)
+}
+runApp()
+x="Pavimentación"
+y="Hermosillo"
+z="Hermosillo"
+grafico <- function(x=cort, y=loc, z=mun){
+nombres  <- texto %>% filter(nom_cort==x)
+locmun <- localidades %>% filter(nom_mun==z & nom_loc==y)
+descarga <- paste0("https://raw.githubusercontent.com/ISAFdatos/Entorno-Urbano/main/mapas/",locmun$cveloc,"_",nombres$caract,"_2020.png")
+sonmza <- readRDS(paste0("datos/municipios_rds/",locmun$nom_mun,"_caract.rds")) %>%
+filter(cveloc == locmun$cveloc & caract==nombres$caract)
+nombres$subtitulo <- paste(strwrap(nombres$subtitulo, width = 45), collapse = "\n")
+loc_aggr <- sonmza %>%
+group_by(clasf_prop) %>% summarise(Manzanas=sum(num), Poblacion=sum(pobtot)) %>%
+mutate(pctj=round(Manzanas*100/sum(Manzanas),0),
+Proporción=paste0(pctj,"%")) %>%
+mutate(valor=case_when(clasf_prop=="Todas las\r\nvialidades"~ 3,
+clasf_prop=="Alguna\r\nvialidad"~ 2,
+clasf_prop=="Ninguna\r\nvialidad"~ 1)) %>%
+mutate(clasf_prop= fct_reorder(clasf_prop, valor, .desc = FALSE))
+colors <- c("Todas las\r\nvialidades" = "#FD9D24","Alguna\r\nvialidad"="#72bcd5",  "Ninguna\r\nvialidad"= "#376795")
+caractG <- ggplot(loc_aggr ) +
+geom_col(aes(x= clasf_prop, y= pctj, fill=clasf_prop, text=paste0(prettyNum(loc_aggr$Manzanas,big.mark = ","), " manzanas<br>",prettyNum(loc_aggr$Poblacion,big.mark = ",")," habs." )), linetype= "solid", size=1, width = .4)+
+geom_text(aes(x= clasf_prop, y= pctj+15, label=Proporción, text=paste0(prettyNum(loc_aggr$Manzanas,big.mark = ","), " manzanas<br>",prettyNum(loc_aggr$Poblacion,big.mark = ",")," habs." ),color=clasf_prop), family="Manrope", ) +
+scale_fill_manual(name="", values= colors) +
+scale_color_manual(name="", values= colors) +
+theme_minimal() +
+scale_y_continuous(limits=c(0,120)) +
+tema +
+labs(y = NULL, x = NULL, fill = NULL, title = NULL ) +
+coord_flip()
+ggplotly(caractG, tooltip = "text") %>%
+layout(font=lyo, showlegend = FALSE, title = list(text =paste0("<b>", nombres$subtitulo,"</b>"), font=t,  x = 0, xanchor = 'left'),
+annotations = list(x = 1, y = 0,
+text = paste0("<a href = '",descarga,"'>Descarga este mapa</a>"),
+xref='paper', yref='paper', showarrow = F, font=t,
+xanchor='right', yanchor='auto', xshift=0, yshift=0,
+font = list(size = 15))) %>%
+config(displaylogo = FALSE,
+modeBarButtonsToRemove = list(
+'sendDataToCloud',
+'toImage',
+'pan2d',
+'lasso2d',
+'hoverClosestCartesian',
+'hoverCompareCartesian',
+'toggleSpikelines',
+'select2d',
+'zoomIn2d',
+'zoomOut2d',
+'resetScale2d'
+))
+}
+grafico(x,y,z)
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()

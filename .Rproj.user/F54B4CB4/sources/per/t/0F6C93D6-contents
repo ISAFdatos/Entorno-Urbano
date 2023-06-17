@@ -1,0 +1,759 @@
+---
+title: 'INCIDENCIA DELICTIVA EN SONORA'
+output:
+  flexdashboard::flex_dashboard:
+    favicon: ODS16.png
+    navbar:
+    - title: ISAF
+      href: http://www.isaf.gob.mx/
+      align: right
+    theme:
+      version: 4
+      bg: '#FFFFFF'
+      fg: '#00689D'
+      primary: '#00689D'
+      navbar-bg: '#FFFFFF'
+      base_font:
+        google: Manrope
+      heading_font:
+        google: Manrope
+    orientation: columns
+runtime: shiny
+---
+
+
+
+
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library('Cairo')
+library(janitor)
+library(sf)
+library(ggspatial)
+library(rgdal)
+library(shiny)
+library(shinycssloaders)
+library(htmltools)
+library(htmlwidgets)
+library(flexdashboard)
+library(leaflet)
+library(leaflet.extras)
+library(leafem)
+library(plotly)
+library(lubridate)
+library(scales)
+# .libPaths(c('r-lib', .libPaths()))
+# install.packages('r-lib/extrafontdb_1.0.tar.gz',type = 'source',repos = NULL)
+```
+        
+
+```{css}
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&display=swap');
+
+.navbar-brand {
+    display: inline-block;
+    padding-top: 0.32422rem;
+    padding-bottom: 0.32422rem;
+    margin-right: 1rem;
+    font-size: 1.17188rem;
+    font-weight: 900;
+    line-height: inherit;
+    white-space: nowrap;
+}
+
+
+.value-box .value {
+    color: #00689D;
+}
+.value-box .caption {
+    color:#00689D;
+    font-size: 12px;
+}
+
+.form-group {
+    margin-bottom: 0rem;
+}
+
+.form-group .selectize-control {
+    margin-bottom: 5px;
+}
+
+.mobile-layout .shiny-input-container label {
+    font-family: 'Manrope';
+    font-weight: normal;
+    color: #00689D !important;
+}
+.mobile-layout .chart-wrapper .chart-stage {
+  overflow-y: auto !important;
+}
+.mobile-layout .chart-stage .shiny-bound-output {
+    width: initial !important;
+    height: inherit !important;
+}
+
+
+.value-box {
+  height: 115px;
+  border: 1px solid #B2D2E2 ;
+}
+
+.section.sidebar {
+    position: fixed;
+    top: 51px;
+    left: 0;
+    bottom: 0;
+    border-right: 1px solid #e2e2e2;
+    background-color: #00689D;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: auto;
+    
+}
+.chart-title {
+    border-bottom: 1px solid #FFFFFF;
+    color: #00689D;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 7px 10px 4px;
+
+}
+.chart-stage  element.style {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    text-anchor: middle;
+    font-family: 'Manrope';
+    font-size: 20px;
+    font-weight: 900;
+    fill-opacity: 1;
+
+
+}
+
+.shiny-input-container label {
+    font-family: 'Manrope';
+    font-weight: normal;
+    color: white;
+}
+
+.value-box .value {
+    font-family: 'Manrope';
+    font-size: 34px;
+    font-weight: 900;
+    margin: 0 0 3px 0;
+    white-space: nowrap;
+    padding: 0;
+}
+
+.info {
+    padding: 6px 8px;
+    font: 8px/10px ;
+    font-family: 'Manrope';
+    background: white;
+    <!-- background: rgba(255,255,255,0.4); -->
+    box-shadow: 0 0 0px rgb(0 0 0 / 0%);
+    border-radius: 5px;
+}
+
+.shiny-output-error { visibility: hidden; }",
+  .shiny-output-error:before { visibility: hidden; }
+    
+```
+
+```{r global,include=FALSE}
+
+
+
+tema <- theme(
+  panel.background = element_blank(),
+  axis.text.x = element_text(family = "Manrope", size = 10, color = "black"),
+    axis.text.y = element_text(family = "Manrope", size = 10, color = "black"),
+  panel.grid.major = element_line(color="gray90", size = 0.75,
+                                  linetype = 2), 
+  panel.grid.minor.y = element_blank(),
+  panel.grid.minor.x = element_blank(),
+  plot.title = element_text(family = "Manrope", size = 10, color = "black"),
+  axis.line = element_blank(),
+  plot.title.position = "plot",
+  axis.title = element_text(family = "Manrope", size = 12)) 
+
+t <- list(
+  size = 14,
+  family = "Manrope",
+  color = "#00689D")
+l <- list(
+  size = 14,
+  family = "Manrope",
+  color = "black")
+l2 <- list(
+  size = 12,
+  family = "Manrope",
+  color = "black")
+
+titulo <- "Poppins ExtraBold"
+negrita <- "Manrope"
+ligera <- "Manrope Light"
+grafico <- "Roboto Condensed"
+
+paleta <- c("#00689D","#002f47",  "#376795", "gray85" )
+
+nombres <- read_csv("datos/clasificacion.csv")  
+delitos <- read_csv("datos/delitosestatal26.csv")  
+serie <- read_csv("datos/STdelitosestatal26.csv")  
+grupo <- c("Estatal", "Urbano", "Semiurbano", "Rural grande", "Rural chico")
+
+
+fondo <- "white"
+nombresv <- read_csv("datos/nombresv.csv")  
+delitos_vic <- read_csv("datos/Victimas26.csv")  
+vserie <- read_csv("datos/STVictimas26.csv") 
+vprioridades <- read_csv("datos/vprioridades.csv") 
+
+
+```
+
+
+CARPETAS DE INVESTIGACIÓN
+===================================== 
+
+ {.sidebar}
+-----------------------------------------------------------------------
+
+
+```{r}
+
+
+selectizeInput("grup", label = "Grupo poblacional:", choices = grupo, selected="Estatal")
+
+clasf <- reactive({
+    delitos %>%  
+      filter(clasificacion_poblacion==input$grup) 
+    })
+renderUI({selectizeInput("mun", label = "Municipio:", choices = sort(unique(clasf()$municipio), decreasing=FALSE), selected="Sonora")})
+
+selectizeInput("ano", label = "Año:", choices = sort(unique(delitos$ano), decreasing=TRUE), selected="2023")
+
+selectizeInput("x", label = "Periodo:", choices = c("Enero-Diciembre","Enero-Mayo","Mayo"), selected="Enero-Mayo")
+
+selectInput("tdd", label = "Delito:", choices =split(nombres$tipo_de_delito,paste0(nombres$cve_bja,". ",nombres$bien_juridico_afectado)),  selected="Todos los delitos")
+
+
+nombres_tdd <- reactive({
+    nombres %>%
+      filter(tipo_de_delito==input$tdd)
+    })
+
+renderUI({selectizeInput("stdd", label = "Tipo específico:", choices =sort(unique(nombres_tdd()$subtipo_de_delito), decreasing=TRUE),  selected="Todos los tipos")})
+
+nombres_mod <- reactive({
+    nombres_tdd() %>%
+      filter(subtipo_de_delito==input$stdd)
+    })
+
+renderUI({selectizeInput("mod", label = "Modalidad:", choices = sort(nombres_mod()$modalidad, decreasing=TRUE), selected="Todas las modalidades")})
+
+
+
+
+```
+<center>
+[![](https://www.un.org/sustainabledevelopment/es/wp-content/uploads/sites/3/2019/09/S-WEB-Goal-16-400x400.png){width=150px}](https://www.un.org/sustainabledevelopment/es/peace-justice/)
+</center>     
+
+Column2 {data-width=240}
+-----------------------------------------------------------------------
+
+### 
+```{r, }
+renderValueBox({
+   delito <- delitos %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, periodo==input$x, ano==input$ano, municipio==input$mun, modalidad==input$mod)
+    valueBox(str_to_upper(input$mun), color=alpha("white", 1), caption= paste0( prettyNum(as.numeric(delito$poblacion), big.mark=",", preserve.width="none")," habs."))
+    })
+
+```
+### 
+```{r}
+  renderValueBox({
+       valueBox(str_replace(str_replace(str_replace(str_replace(str_replace(input$tdd,"delitos que atentan contra la", "-"), "delitos del","-"), "cometidos por servidores","por serv."), "Incumplimiento de obligaciones", "Incump. de obl."), "Violencia de género en todas sus modalidades distinta a la violencia familiar", "Violencia de género"), color=alpha("white", 1), caption= paste0(str_replace(str_replace(str_replace(str_replace(str_replace(input$stdd,"delitos que atentan contra la", "-"), "delitos del","-"), "cometidos por servidores","por serv."), "Incumplimiento de obligaciones", "Incump. de obl."), "Violencia de género en todas sus modalidades distinta a la violencia familiar", "Violencia de género"),", ", str_replace(tolower(input$mod), "robo de coche de 4 ruedas", "coche "),'<br>', input$x," ",input$ano))
+    })
+```
+### 
+```{r}
+ renderValueBox({
+   delito <- delitos %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, periodo==input$x, ano==input$ano, municipio==input$mun, modalidad==input$mod)
+    valueBox(paste0( prettyNum(as.numeric(delito$carpetas), big.mark=",", preserve.width="none")), color=alpha("white", 1), 
+             caption= paste0("Carpetas de investigación",'<br>',"Lugar nacional en grupo ", input$grup,": ", prettyNum(as.numeric(delito$rank_nacional_absoluto), big.mark=",", preserve.width="none"),"°" ))
+    })
+```
+
+### 
+```{r}
+  renderValueBox({
+   delito <- delitos %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, periodo==input$x, ano==input$ano, municipio==input$mun, modalidad==input$mod)
+    valueBox(paste0( prettyNum(as.numeric(delito$incidencia), big.mark=",", preserve.width="none")), color=alpha("white", 1), caption= paste0("Carpetas por 100 mil habs.",'<br>',"Lugar nacional en grupo ", input$grup,": ", prettyNum(as.numeric(delito$rank_nacional_relativo), big.mark=",", preserve.width="none"),"°" ))
+    })
+```
+
+### Participación en carpetas estatales
+```{r}
+  renderGauge({
+   proporcion <- delitos %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, periodo==input$x, ano==input$ano, municipio==input$mun, modalidad==input$mod)
+   gauge(value=proporcion$prop, 
+          min = 0, 
+          max = 100,
+         symbol="%",
+         label="del total estatal",
+          sectors = gaugeSectors(success = c(50, 100), 
+                                 warning = c(30, 50),
+                                 danger = c(0, 30), colors = c("#00689D", "#00689D", "#00689D"))
+         ) 
+  })
+```
+
+
+
+ {data-width=450}
+-----------------------------------------------------------------------
+
+### 
+```{r, }
+
+output$plot1 <- renderPlotly({
+  
+  titulo <- paste0( "<b>Carpetas acumuladas"," en ",  tolower(input$x), " de cada año</b>")
+  delito <- delitos %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, periodo==input$x, municipio==input$mun, modalidad==input$mod ) %>% 
+    mutate(var=round((carpetas-lag(carpetas))*100/lag(carpetas),1)) %>% 
+    mutate(Carpetas=paste0(prettyNum(carpetas, big.mark=",") ,"\nVariación: ",if_else(is.na(var),"",if_else(var>=0,"+","")), var,"%"), transp=if_else(ano==input$ano, 1, 0))
+  
+caractG <- ggplot(delito) +
+      geom_col(aes(x= ano, y= carpetas, alpha=factor(transp), 
+                   label=Carpetas), fill= "#00689D", linetype= "solid", size=1, width = .4)+
+      # geom_text(aes(x= ano, y= carpetas, label=carpetas, color=as.character(ano)), family="Manrope", vjust=0.5) +
+      scale_x_continuous(breaks = seq(from = 2015, to = 2023, by = 1))+
+      scale_y_continuous( labels = scales::comma, limits=c(0,max(delito$carpetas)))+
+      scale_alpha_manual(values=c(0.3,1)) +
+      theme_minimal() +
+      tema + theme(panel.grid.major.x = element_blank()) +
+      labs(y = NULL, x = NULL, fill = NULL, title = NULL ) 
+
+ggplotly(caractG, tooltip = "Carpetas") %>%
+      layout(showlegend = FALSE, 
+             title = list(text = titulo, font=t,  x = 0, xanchor = 'left')) %>%  
+  config(displaylogo = FALSE,
+                                                       modeBarButtonsToRemove = list(
+                                                         'sendDataToCloud',
+                                                         'toImage',
+                                                         'pan2d',
+                                                         'lasso2d',
+                                                         'hoverClosestCartesian',
+                                                         'hoverCompareCartesian',
+                                                         'toggleSpikelines',
+                                                         'select2d',
+                                                         'zoomIn2d',
+                                                         'zoomOut2d',
+                                                         'resetScale2d'
+                                                       ))
+ }) 
+
+  
+plotlyOutput("plot1") 
+```
+
+
+### 
+```{r, }
+output$plot2 <- renderPlotly({
+  titulo <- paste0("<b>Carpetas mensuales por 100 mil habitantes</b>")
+
+  
+  periodos <- data.frame (
+  periodo = c('Enero-Diciembre', 'Enero-Abril', 'Abril'),
+  meses = c("enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre","enero,febrero,marzo,abril","Mayo" )) %>% 
+    filter(periodo==input$x)
+  
+  mesperiodo <-str_split(periodos$meses, ",") %>% unlist()
+  
+  seriedelito <- serie %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, modalidad==input$mod, municipio==input$mun | municipio=="Sonora" | municipio=="México") %>% mutate(Carpetas=paste0(prettyNum(carpetas, big.mark=","), "\n",prettyNum(incidencia, big.mark=","), " por 100 mil habs.\n", mes, " ", ano), transp=if_else(mes %in% mesperiodo & ano==input$ano, 1, 0), 
+       nivel= if_else(municipio==input$mun, paste0("1. ",input$mun), 
+                      if_else(municipio=="México", paste0("2. ","Nacional"), paste0("3. ","Estatal"))))
+  #seriesonora <- serie %>% filter(subtipo_de_delito==input$stdd, municipio=="Sonora") %>% mutate(nivel=paste0("2. ", municipio)) 
+  #seriemexico <- serie %>% filter(subtipo_de_delito==input$stdd, municipio=="México") %>% mutate(nivel=paste0("3. ", municipio)) 
+colores <- c("#00689D", alpha("#9d0068", 0.35), alpha("#689d00", 0.35))
+
+caract2 <- ggplot(seriedelito,aes(x= fecha, y= incidencia, color=nivel)) +
+      geom_point(data=subset(seriedelito, transp==1 & municipio==input$mun ), aes(label=Carpetas),
+                 color=alpha("#00689D",0.8))+
+      geom_point(data=subset(seriedelito, transp==0 & municipio==input$mun), aes(label=Carpetas),
+                 color=alpha("#00689D",0.1))+
+      geom_smooth(linetype= "solid", size=0.7, method="loess",  span = 0.2, se=FALSE)+
+      geom_smooth(linetype= "solid", size=0.7, method="loess",  span = 0.2, se=FALSE)+
+      geom_smooth(linetype= "solid", size=0.7, method="loess",  span = 0.2, se=FALSE)+
+      geom_vline(xintercept=as.numeric(ymd("2021-09-01")), linetype="dotted", color = "gray50") +
+      scale_color_manual(name="", values= colores, labels=c("Municipio", "Sonora", "México")) +
+      scale_x_date(date_breaks = "1 year", labels=date_format("%Y")) +
+      scale_y_continuous( labels = scales::comma)+
+      theme_minimal() +
+      tema +  theme(axis.text.x = element_text(family = "Manrope", size = 10, color = "black"), legend.position = 'top')+
+      labs(y = NULL, x = NULL, fill = NULL, title = NULL ) 
+
+
+ggplotly(caract2, tooltip = "Carpetas") %>%
+      layout(showlegend = TRUE, legend = list(title=list(text='<b> Tendencia </b>', font=l), font=l2, orientation = 'h', xanchor = "left"),
+             title = list(text = titulo, font=t,  x = 0, xanchor = 'left')) %>%  
+  config(displaylogo = FALSE,
+                                                       modeBarButtonsToRemove = list(
+                                                         'sendDataToCloud',
+                                                         'toImage',
+                                                         'pan2d',
+                                                         'lasso2d',
+                                                         'hoverClosestCartesian',
+                                                         'hoverCompareCartesian',
+                                                         'toggleSpikelines',
+                                                         'select2d',
+                                                         'zoomIn2d',
+                                                         'zoomOut2d',
+                                                         'resetScale2d'
+                                                       ))
+ }) 
+
+plotlyOutput("plot2")
+
+```
+
+{data-width=250}
+-----------------------------------------------------------------------
+
+### {.no-mobile}
+```{r, }  
+
+output$map1 <- renderLeaflet({
+
+    if (input$mun!="Sonora") {
+      delitos <- delitos %>% filter(municipio==input$mun )
+    }
+  
+  delito <- delitos %>% filter(tipo_de_delito==input$tdd, subtipo_de_delito==input$stdd, ano==input$ano,periodo==input$x, modalidad==input$mod) 
+
+   #delito <- delitos %>% filter(subtipo_de_delito=="Homicidio doloso", ano=="2023",periodo=="Mayo", municipio!="Sonora") 
+  
+  capa_munison <- st_read("Shapes/MUNSON.gpkg")  %>% 
+  clean_names() %>% mutate(cve_mun=concat) %>%  select(-nom_mun) %>% 
+    merge(delito)   # Se incorpora la información censal al shape de colonias
+  
+
+  capa_munison <- st_transform(capa_munison, crs = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")) %>% 
+  st_make_valid()
+
+
+ 
+  balpal <-  colorFactor(c("#002f47","#00689D","#4fc3ff","#c4ebff", "gray85" ), levels= c(4,3,2,1,0), na.color ="gray85", ordered=FALSE)
+  balpal_inv <-  colorFactor(c("#002f47","#00689D","#4fc3ff","#c4ebff", "gray85"), levels= c(4,3,2,1,0), na.color ="gray85", ordered=FALSE, reverse=TRUE)
+  
+  marcas <- c( "Alto","Substancial","Moderado", "Bajo", "Sin incidencia")
+  
+  popup <- paste0("<span style = 'font-family:Manrope; border-color:rgba(0,0,0,0); color:#002f47'>",
+     "<b>", "Municipio: ",        "</b>",   (delito$municipio) ,     "<br>",
+        "<b>", "Periodo: ",        "</b>", input$x ," ", input$ano,    "<br>",
+     "<b>", "Tipo de delito: ",        "</b>",   (delito$tipo_de_delito) ,     "<br>",
+     "<b>", "Subtipo de delito: ",        "</b>",   (input$stdd) ,     "<br>",
+      "<b>", "Modalidad: ",        "</b>",   (input$mod) ,     "<br>",
+     "<b>", "Carpetas: ",        "</b>",   prettyNum(capa_munison$carpetas, big.mark=",") ,     "<br>",
+     "<b>", "Incidencia (x 100 mil habs.): ",        "</b>",   capa_munison$incidencia ,     "<br>",
+     "<b>", "Grupo municipal: ",        "</b>",   capa_munison$clasificacion_poblacion ,     "<br>",
+     "<b>", "Nivel de incidencia: ",        "</b>",   case_when(capa_munison$nivel== 0 ~ "Sin incidencia",
+                                                                capa_munison$nivel== 1 ~ "Bajo",
+                                                                capa_munison$nivel== 2 ~ "Moderado",
+                                                                capa_munison$nivel== 3 ~ "Substancial",
+                                                                capa_munison$nivel== 4 ~ "Alto"),     "<br>","</span>")  %>% 
+    lapply(htmltools::HTML)
+  
+  label <- paste0(
+     "<b>", str_to_upper(delito$municipio) ,    "</b>")  %>% lapply(htmltools::HTML)
+
+
+  
+leaflet(capa_munison, options = leafletOptions(zoomControl = FALSE)) %>% 
+    addProviderTiles(providers$CartoDB.PositronNoLabels) %>%
+    addPolygons(data= capa_munison,
+                stroke= TRUE,
+                weight=0.7,                   
+                opacity=1,
+                fillColor = ~balpal(capa_munison$nivel),
+                color= "white",
+                fillOpacity = 0.8,
+                smoothFactor = 0.5,
+                highlightOptions = highlightOptions(color = "black", 
+                                                    weight = 1,
+                                                    bringToFront = TRUE),
+                popup=popup,
+                popupOptions = labelOptions(noHide = F, direction = "top", 
+                                            closeOnClick = TRUE, 
+                                            style = list(
+                                              "color" = "#002f47",
+                                              "font-family" = "Manrope",
+                                              "font-style" = "regular",
+                                              "box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+                                              "font-size" = "11px",
+                                              "border-color" = "rgba(0,0,0,0)"
+                                            )),
+                label=label,
+                labelOptions = labelOptions(noHide = F, direction = "top",
+                                            style = list(
+                                              "color" = "#002f47",
+                                              "font-family" = "Manrope",
+                                              "font-style" = "regular",
+                                              "box-shadow" = "2px 2px rgba(0,0,0,0.25)",
+                                              "font-size" = "11px",
+                                              "border-color" = "rgba(0,0,0,0)"
+                                            )),
+                group= "INCIDENCIA") %>%
+  addLegend(position = "bottomright",  pal = balpal_inv, values = c(0, 1,2,3,4), opacity=0.8, group= "INCIDENCIA", 
+            labFormat = function(type, cuts, p) {  
+              paste0(marcas)} ,
+            title = "NIVEL DE INCIDENCIA", na.label = "Sin Incidencia") %>% 
+      onRender(
+        "function(el, x) {
+          L.control.zoom({
+            position:'topright'
+          }).addTo(this);
+        }") 
+})
+
+leafletOutput("map1") 
+```
+VICTIMAS DE DELITO
+===================================== 
+
+ {.sidebar}
+-----------------------------------------------------------------------
+
+
+```{r}
+
+
+
+selectizeInput("ano_v", label = "Año:", choices = sort(unique(delitos_vic$ano), decreasing=TRUE), selected="2023")
+selectizeInput("y", label = "Periodo:", choices = c("Enero-Diciembre","Enero-Mayo","Mayo"), selected="Enero-Mayo")
+
+selectizeInput("vtdd", label = "Tipo de delito:", choices = vprioridades$tipo_de_delito, selected="Todos los delitos")
+
+nombresv_tdd <- reactive({
+    nombresv %>%  
+      filter(tipo_de_delito==input$vtdd) 
+    })
+
+renderUI({selectizeInput("vstdd", label = "Subtipo de delito:", choices =sort(nombresv_tdd()$subtipo_de_delito, decreasing=TRUE), selected="Todos los delitos")})
+
+
+
+selectizeInput("sexo", label = "Sexo:", choices = sort(unique(delitos_vic$sexo), decreasing=TRUE), selected="Todos")
+
+selectizeInput("edad", label = "Rango de edad:", choices = unique(delitos_vic$rango_de_edad), selected="Todos")
+
+
+
+
+```
+
+<center>
+[![](https://www.un.org/sustainabledevelopment/es/wp-content/uploads/sites/3/2019/09/S-WEB-Goal-16-400x400.png){width=150px}](https://www.un.org/sustainabledevelopment/es/peace-justice/)
+</center>     
+
+ {data-width=200}
+-----------------------------------------------------------------------
+
+### 
+```{r}
+renderValueBox({
+      valueBox("SONORA", color=alpha("white", 1))
+})
+```
+
+### 
+```{r}
+  renderValueBox({
+       valueBox(str_replace(str_replace(str_replace(str_replace(str_replace(input$vstdd,"delitos que atentan contra la", "-"), "delitos del","-"), "cometidos por servidores","por serv."), "Incumplimiento de obligaciones", "Incump. de obl."), "Violencia de género en todas sus modalidades distinta a la violencia familiar", "Violencia de género"), color=alpha("white", 1), caption= paste0(input$y," ",input$ano_v))
+    })
+```
+### 
+```{r}
+ renderValueBox({
+   delito <- delitos_vic %>% filter(subtipo_de_delito==input$vstdd, periodo==input$y, ano==input$ano_v, sexo==input$sexo, rango_de_edad==input$edad)
+    valueBox(input$sexo, color=alpha("white", 1), caption= paste0(input$edad, ": ", prettyNum(as.numeric(delito$poblacion), big.mark=",", preserve.width="none")," habs."))
+    })
+```
+
+### 
+```{r}
+ renderValueBox({
+   delito <- delitos_vic %>% filter(subtipo_de_delito==input$vstdd, periodo==input$y, ano==input$ano_v, sexo==input$sexo, rango_de_edad==input$edad)
+    valueBox(paste0( prettyNum(as.numeric(delito$victimas), big.mark=",", preserve.width="none")), color=alpha("white", 1), 
+             caption= paste0("Víctimas de delito",'<br>',"Lugar nacional : ", prettyNum(as.numeric(delito$rank_nacional_absoluto), big.mark=",", preserve.width="none"),"°" ))
+    })
+```
+
+### 
+```{r}
+  renderValueBox({
+   delito <- delitos_vic %>% filter(subtipo_de_delito==input$vstdd, periodo==input$y, ano==input$ano_v, sexo==input$sexo, rango_de_edad==input$edad)
+    valueBox(paste0( prettyNum(as.numeric(delito$incidencia), big.mark=",", preserve.width="none")), color=alpha("white", 1), caption= paste0("Víctimas por 100 mil habs.",'<br>',"Lugar nacional: ", prettyNum(as.numeric(delito$rank_nacional_relativo), big.mark=",", preserve.width="none"),"°" ))
+    })
+```
+
+### Participación en total estatal del subdelito
+```{r}
+  renderGauge({
+   proporcion <- delitos_vic %>% filter(subtipo_de_delito==input$vstdd, periodo==input$y, ano==input$ano_v, sexo==input$sexo, rango_de_edad==input$edad)
+   gauge(value=proporcion$prop, 
+          min = 0, 
+          max = 100,
+         symbol="%",
+         label="del total estatal",
+          sectors = gaugeSectors(success = c(50, 100), 
+                                 warning = c(30, 50),
+                                 danger = c(0, 30), colors = c("#00689D", "#00689D", "#00689D"))
+         ) 
+  })
+```
+
+
+
+ {data-width=700}
+-----------------------------------------------------------------------
+
+### 
+```{r, }
+
+output$plot3 <- renderPlotly({
+  
+  titulo <- paste0( "<b>Víctimas acumuladas"," en ",  tolower(input$y), " de cada año: " ,tolower(input$vstdd),"</b>")
+  delito_vic <- delitos_vic %>% filter(subtipo_de_delito==input$vstdd, periodo==input$y, sexo==input$sexo, rango_de_edad==input$edad) %>% 
+    mutate(var=round((victimas-lag(victimas))*100/lag(victimas),1)) %>% 
+    mutate(Víctimas=paste0(prettyNum(victimas, big.mark=",") ,"\nVariación: ",if_else(is.na(var),"",if_else(var>=0,"+","")), var,"%"), transp=if_else(ano==input$ano_v, 1, 0))
+  
+vcaractG <- ggplot(delito_vic) +
+      geom_col(aes(x= ano, y= victimas, alpha=factor(transp), 
+                   label=Víctimas), fill= "#00689D", linetype= "solid", size=1, width = .4)+
+      # geom_text(aes(x= ano, y= carpetas, label=carpetas, color=as.character(ano)), family="Manrope", vjust=0.5) +
+      scale_x_continuous(breaks = seq(from = 2015, to = 2023, by = 1))+
+      scale_y_continuous( labels = scales::comma, limits=c(0,max(delito_vic$victimas)))+
+      scale_alpha_manual(values=c(0.3,1)) +
+      theme_minimal() +
+      tema + theme(panel.grid.major.x = element_blank()) +
+      labs(y = NULL, x = NULL, fill = NULL, title = NULL ) 
+
+ggplotly(vcaractG, tooltip = "Víctimas") %>%
+      layout(showlegend = FALSE, 
+             title = list(text = titulo, font=t,  x = 0, xanchor = 'left')) %>%  
+  config(displaylogo = FALSE,
+                                                       modeBarButtonsToRemove = list(
+                                                         'sendDataToCloud',
+                                                         'toImage',
+                                                         'pan2d',
+                                                         'lasso2d',
+                                                         'hoverClosestCartesian',
+                                                         'hoverCompareCartesian',
+                                                         'toggleSpikelines',
+                                                         'select2d',
+                                                         'zoomIn2d',
+                                                         'zoomOut2d',
+                                                         'resetScale2d'
+                                                       ))
+ }) 
+plotlyOutput("plot3")
+```
+
+
+### 
+```{r, }
+output$plot4 <- renderPlotly({
+
+  titulo <- paste0("<b>Víctimas mensuales por 100 mil habitantes: ", tolower(input$vstdd),"</b>")
+
+  
+  periodos <- data.frame (
+  periodo = c('Enero-Diciembre', 'Enero-Abril', 'Abril'),
+  meses = c("enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre","enero,febrero,marzo,abril","Mayo" )) %>% filter(periodo==input$y)
+  
+  mesperiodo <-str_split(periodos$meses, ",") %>% unlist()
+  
+  vseriedelito <- vserie %>% filter(subtipo_de_delito==input$vstdd, entidad== "Sonora" | entidad== "México",
+                                    sexo==input$sexo, rango_de_edad==input$edad) %>%
+    mutate(Víctimas=paste0(prettyNum(victimas, big.mark=","), "\n",prettyNum(incidencia, big.mark=","), " por 100 mil habs.\n", mes, " ", ano),
+           transp=if_else(mes %in% mesperiodo & ano==input$ano_v, 1, 0), 
+       nivel= if_else(entidad=="Sonora", "1. Sonora", "2. Nacional"))
+  #seriesonora <- serie %>% filter(subtipo_de_delito==input$stdd, municipio=="Sonora") %>% mutate(nivel=paste0("2. ", municipio)) 
+  #seriemexico <- serie %>% filter(subtipo_de_delito==input$stdd, municipio=="México") %>% mutate(nivel=paste0("3. ", municipio)) 
+colores <- c("#00689D", alpha("#9d0068", 0.35))
+
+caract3 <- ggplot(vseriedelito,aes(x= fecha, y= incidencia, color=nivel)) +
+      geom_point(data=subset(vseriedelito, transp==1 & entidad=="Sonora" ), aes(label=Víctimas),
+                 color=alpha("#00689D",0.8))+
+      geom_point(data=subset(vseriedelito, transp==0 & entidad=="Sonora"), aes(label=Víctimas),
+                 color=alpha("#00689D",0.1))+
+      geom_smooth(linetype= "solid", size=0.7, method="loess",  span = 0.2, se=FALSE)+
+      geom_smooth(linetype= "solid", size=0.7, method="loess",  span = 0.2, se=FALSE)+
+      geom_smooth(linetype= "solid", size=0.7, method="loess",  span = 0.2, se=FALSE)+
+      geom_vline(xintercept=as.numeric(ymd("2021-09-01")), linetype="dotted", color = "gray50") +
+      scale_color_manual(name="", values= colores, labels=c( "Sonora", "México")) +
+      scale_x_date(date_breaks = "1 year", labels=date_format("%Y")) +
+      scale_y_continuous( labels = scales::comma)+
+      theme_minimal() +
+      tema +  theme(axis.text.x = element_text(family = "Manrope", size = 10, color = "black"), legend.position = 'top')+
+      labs(y = NULL, x = NULL, fill = NULL, title = NULL ) 
+
+
+ggplotly(caract3, tooltip = "Víctimas",height = 380) %>%
+      layout(showlegend = TRUE, legend = list(title=list(text='<b> Tendencia </b>', font=l, orientation = 'h', xanchor = "left"), font=l2, orientation = 'h', xanchor = "left"),
+             title = list(text = titulo, font=t,  x = 0, xanchor = 'left')) %>%  
+  config(displaylogo = FALSE,
+                                                       modeBarButtonsToRemove = list(
+                                                         'sendDataToCloud',
+                                                         'toImage',
+                                                         'pan2d',
+                                                         'lasso2d',
+                                                         'hoverClosestCartesian',
+                                                         'hoverCompareCartesian',
+                                                         'toggleSpikelines',
+                                                         'select2d',
+                                                         'zoomIn2d',
+                                                         'zoomOut2d',
+                                                         'resetScale2d'
+                                                       ))
+ }) 
+# withSpinner(plotlyOutput("plot4"), type=7, color="#00689D", proxy.height ="400px")
+
+plotlyOutput("plot4")
+```
+
+
+
+
+NOTAS
+===================================== 
+<br>
+
+
+<b><font size="5">FUENTES</font></b>
+<br>
+<font size="3">Datos abiertos de incidencia delictiva del Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública.</font>
+<br>
+<font size="3">Proyección de Población de las Entidades Federativas y los Municipios del Consejo Nacional de Población.</font>
+<br>
+<br>
+
+<br>
+<font size="3"><b>Grupos municipales:</font></b><br>
+<font size="2"><b>Urbanos:</b> más de 150 mil habs. </font> <br>
+<font size="2"><b>Semiurbanos:</b> más de 50 mil a 150 mil habs.</font><br>
+<font size="2"><b>Rurales grandes:</b> más de 15 mil a 50 mil habs. </font><br>
+<font size="2"><b>Rurales chicos:</b> 15 mil habitantes o menos.</font><br>
+<br>
+<br>
+[![](https://raw.githubusercontent.com/ISAFdatos/Mapas-Colonias-Sonora/main/logos/ISAF%20ODS%20color.png){width=210px}](www.isaf.gob.mx)<br>
+<font size="1">Elaborado por la Dirección General de Estudios de Políticas Públicas y Análisis de Datos del ISAF.</font>
+
+<br>
+<font size="5">Actualizado con la información disponible al 13 de junio de 2023.</font>
+ 
