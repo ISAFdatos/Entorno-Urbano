@@ -1,7 +1,7 @@
 source("global.R")
 
 
-ui <- tagList(dashboardPage(
+ui <- tagList(dashboardPage(title="ENTORNO URBANO 2020",
   skin = "yellow-light", 
   md = TRUE, 
 
@@ -22,7 +22,8 @@ ui <- tagList(dashboardPage(
                    ),
   dashboardBody(
     tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+      tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+      tags$link(rel = "icon", type = "image/png", sizes = "32x32", href = "ODS_11_naranja.png")
     ),
     tabItems(
       tabItem(tabName = "dashboard",
